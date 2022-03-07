@@ -53,6 +53,7 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation project(path: ':domain')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -60,5 +61,8 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 
     // Navigation
-    implementation "androidx.navigation:navigation-compose:$version_navigation_compose"
+    implementation "androidx.navigation:navigation-compose:$navigation_compose_version"
+
+    // Coil
+    implementation "io.coil-kt:coil-compose:$coil_version"
 }
