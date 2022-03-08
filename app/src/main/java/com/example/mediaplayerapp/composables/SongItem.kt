@@ -1,6 +1,7 @@
 package com.example.mediaplayerapp.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -21,7 +22,8 @@ import com.example.domain.Song
 @Composable
 fun SongItem(
     song: Song,
-    index: Int
+    index: Int,
+    showDetails: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -69,14 +71,11 @@ fun SongItem(
                         Column {
                             Text(
                                 text = song.name,
-                                style = MaterialTheme.typography.body1,
-                                color = Color.Black,
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1
                             )
                             Text(
                                 text = song.artist,
-                                style = MaterialTheme.typography.body2,
                                 color = Color.Gray,
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1
@@ -92,9 +91,10 @@ fun SongItem(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Icon(
-                    Icons.Filled.MoreVert,
+                    imageVector = Icons.Filled.MoreVert,
                     contentDescription = "See details",
-                    tint = MaterialTheme.colors.primary
+                    tint = MaterialTheme.colors.primary,
+                    modifier = Modifier.clickable { showDetails(song.id) }
                 )
             }
         }

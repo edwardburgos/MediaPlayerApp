@@ -9,13 +9,10 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.net.Uri
 import com.example.domain.Song
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 class PlayerManager {
 
     var song: MediaPlayer? = null
-    private var mmr: MediaMetadataRetriever? = null
     lateinit var cover: Bitmap
     var songName = "unknown"
     var artist = "unknown"
@@ -25,7 +22,6 @@ class PlayerManager {
     private var contador = 0
     private lateinit var canciones: List<Int>
     var listenerWhenCompleted = false
-    lateinit var genreFileLines: List<String>
     lateinit var songsBasicInformation: List<Song>
 
     fun createMediaPlayer(con: Context) {
@@ -94,67 +90,44 @@ class PlayerManager {
     }
 
     fun associateInfo(con: Context) {
-        if (mmr == null) mmr = MediaMetadataRetriever()
-        mmr?.let {
-            it.setDataSource(
-                con,
-                Uri.parse("android.resource://com.example.mediaplayerapp/${currentSong!!}")
-            )
-            cover = createCover(it, con)
-            songName = it.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE).toString()
-            artist = it.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST).toString()
-            album = it.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM).toString()
-            genero = findGenreName(it)
-        }
-    }
-
-    fun readGenres(con: Context) {
-        genreFileLines =
-            BufferedReader(InputStreamReader(con.resources.openRawResource(R.raw.genres))).readLines();
+        var metadataRetriever = MediaMetadataRetriever()
+        metadataRetriever.setDataSource(
+            con,
+            Uri.parse("android.resource://com.example.mediaplayerapp/${currentSong!!}")
+        )
+        cover = createCover(metadataRetriever, con)
+        songName =
+            metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE).toString()
+        artist =
+            metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST).toString()
+        album =
+            metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM).toString()
+        genero = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+                        .toString()
     }
 
     fun getSongsBasicDetails(con: Context) {
-        if (mmr == null) mmr = MediaMetadataRetriever()
-        songsBasicInformation = mmr?.let {
-            canciones.map { cancion ->
+        var metadataRetriever = MediaMetadataRetriever()
+        songsBasicInformation =
+            canciones.mapIndexed { index, cancion ->
                 cancion
-                it.setDataSource(
+                metadataRetriever.setDataSource(
                     con,
                     Uri.parse("android.resource://com.example.mediaplayerapp/${cancion}")
                 )
                 Song(
-                    cover = createCover(it, con),
-                    name = it.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+                    id = index,
+                    cover = createCover(metadataRetriever, con),
+                    name = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
                         .toString(),
-                    artist = it.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                    artist = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
                         .toString(),
-                    album = it.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+                    album = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
                         .toString(),
-                    genero = findGenreName(it)
+                    genero = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+                        .toString()
                 )
             }
-        } ?: listOf(
-            Song(
-                BitmapFactory.decodeResource(
-                    con.resources,
-                    R.drawable.ic_launcher_background
-                ), "", "", "", ""
-            )
-        )
-    }
-
-    fun findGenreName(metadataRetriever: MediaMetadataRetriever): String {
-        var genreCode =
-            metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE).toString()
-                .substring(1, 3)
-        var name = "unknown"
-        for (element in genreFileLines) {
-            if (element.substring(0, 2) == genreCode) {
-                name = element.substring(3)
-                break
-            }
-        }
-        return name
     }
 
     fun saveCurrent(sharedPreferences: SharedPreferences) {

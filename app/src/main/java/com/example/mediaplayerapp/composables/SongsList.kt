@@ -9,9 +9,9 @@ import com.example.domain.Song
 
 @Composable
 fun SongsList(
-    songs: List<Song>
+    songs: List<Song>,
+    showDetails: (Int) -> Unit
 ) {
-    println(songs)
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -19,7 +19,8 @@ fun SongsList(
         items(songs.size) { index ->
             SongItem(
                 songs.elementAt(index),
-                index
+                index,
+                showDetails
             )
         }
     }
