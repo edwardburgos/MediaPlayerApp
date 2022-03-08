@@ -10,7 +10,8 @@ import com.example.domain.Song
 @Composable
 fun SongsList(
     songs: List<Song>,
-    showDetails: (Int) -> Unit
+    showDetails: (Int) -> Unit,
+    setMediaPlayer: (Int) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -19,8 +20,8 @@ fun SongsList(
         items(songs.size) { index ->
             SongItem(
                 songs.elementAt(index),
-                index,
-                showDetails
+                showDetails,
+                setMediaPlayer
             )
         }
     }

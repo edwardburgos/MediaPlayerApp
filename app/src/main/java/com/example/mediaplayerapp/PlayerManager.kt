@@ -8,102 +8,142 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.net.Uri
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.example.domain.Song
 
 class PlayerManager {
 
-    var song: MediaPlayer? = null
-    lateinit var cover: Bitmap
-    var songName = "unknown"
-    var artist = "unknown"
-    var album = "unknown"
-    var genero = "unknown"
-    var currentSong: Int? = null
-    private var contador = 0
-    private lateinit var canciones: List<Int>
+    val song = mutableStateOf(Song(
+        -1,
+        Bitmap.createBitmap(15, 26, Bitmap.Config.ARGB_8888),
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+    ))
+
+    val mediaPlayer = mutableStateOf<MediaPlayer?>(null)
+    val mediaPlayerPlayingState = mutableStateOf(false)
+//    var mediaPlayer: MediaPlayer? = null
+//    var song =
+
+    //    lateinit var cover: Bitmap
+//    var songName = "unknown"
+//    var artist = "unknown"
+//    var album = "unknown"
+//    var genero = "unknown"
+    var currentSong = -1 // ESTA ES EL INT DEL RESOURCE
+
+    //    private var contador = 0
+    private val canciones: List<Int> = listOf(
+        R.raw.tainylosientobb,
+        R.raw.badgyalrema44,
+        R.raw.debilidad,
+        R.raw.entrenosotrosremix,
+        R.raw.harakakikolosbobosonmio,
+        R.raw.inmortales,
+        R.raw.remix911,
+        R.raw.tiagobiza,
+        R.raw.truenodancecrip,
+        R.raw.verteir,
+        R.raw.tainylosientobb,
+        R.raw.badgyalrema44,
+        R.raw.debilidad,
+        R.raw.entrenosotrosremix,
+        R.raw.harakakikolosbobosonmio,
+        R.raw.inmortales,
+        R.raw.remix911,
+        R.raw.tiagobiza,
+        R.raw.truenodancecrip,
+        R.raw.verteir,
+        R.raw.tainylosientobb,
+        R.raw.badgyalrema44,
+        R.raw.debilidad,
+        R.raw.entrenosotrosremix,
+        R.raw.harakakikolosbobosonmio,
+        R.raw.inmortales,
+        R.raw.remix911,
+        R.raw.tiagobiza,
+        R.raw.truenodancecrip,
+        R.raw.verteir
+    )
     var listenerWhenCompleted = false
     lateinit var songsBasicInformation: List<Song>
+    private lateinit var appContext: Context
 
-    fun createMediaPlayer(con: Context) {
-        canciones = listOf(
-            R.raw.tainylosientobb,
-            R.raw.badgyalrema44,
-            R.raw.debilidad,
-            R.raw.entrenosotrosremix,
-            R.raw.harakakikolosbobosonmio,
-            R.raw.inmortales,
-            R.raw.remix911,
-            R.raw.tiagobiza,
-            R.raw.truenodancecrip,
-            R.raw.verteir,
-            R.raw.tainylosientobb,
-            R.raw.badgyalrema44,
-            R.raw.debilidad,
-            R.raw.entrenosotrosremix,
-            R.raw.harakakikolosbobosonmio,
-            R.raw.inmortales,
-            R.raw.remix911,
-            R.raw.tiagobiza,
-            R.raw.truenodancecrip,
-            R.raw.verteir,
-            R.raw.tainylosientobb,
-            R.raw.badgyalrema44,
-            R.raw.debilidad,
-            R.raw.entrenosotrosremix,
-            R.raw.harakakikolosbobosonmio,
-            R.raw.inmortales,
-            R.raw.remix911,
-            R.raw.tiagobiza,
-            R.raw.truenodancecrip,
-            R.raw.verteir
-        )
-        currentSong = canciones[contador]
-        if (song == null) {
-            val sharedPreferences = con?.getSharedPreferences("general_settings", MODE_PRIVATE)!!
-            currentSong = sharedPreferences.getInt("currentSong", currentSong!!)
-            contador = canciones.indexOf(currentSong)
-            song = MediaPlayer.create(con!!, currentSong!!)
+    fun createMediaPlayer(con: Context, songId: Int, requestedByUser: Boolean) {
+        appContext = con
+//        currentSong = canciones[contador]
+//        if (song.id == -1) {
+        var songResourceIntId = -1
+        if (songId == -1) {
+            songResourceIntId = con?.getSharedPreferences("general_settings", MODE_PRIVATE).getInt("currentSong", -1)
+//            songId =
+        //            var sharedValue = sharedPreferences.getInt("currentSong", -1)
+        } else {
+            songResourceIntId = canciones.elementAt(songId)
         }
+
+        if (songResourceIntId != -1) {
+            currentSong = songResourceIntId
+            associateInfo()
+            if (mediaPlayer != null) {
+                mediaPlayer.value?.stop()
+                mediaPlayer.value?.reset()
+                mediaPlayer.value?.release()
+            }
+            song.value.id = canciones.indexOf(currentSong)
+            mediaPlayer.value = MediaPlayer.create(con!!, currentSong!!)
+            if (requestedByUser) {
+                mediaPlayer.value?.start()
+                mediaPlayerPlayingState.value = true
+            }
+        }
+//        }
     }
 
-    fun nextSong(con: Context) {
-        if (contador != 9) contador += 1 else contador = 0
-        currentSong = canciones[contador]
-        song?.stop()
-        song?.reset()
-        song?.release()
-        song = MediaPlayer.create(con!!, currentSong!!)
-        associateInfo(con!!)
-        song?.start()
+    fun nextSong() {
+        if (song.value.id != canciones.size - 1) song.value.id += 1 else song.value.id = 0
+        currentSong = canciones[song.value.id]
+        mediaPlayer.value?.stop()
+        mediaPlayer.value?.reset()
+        mediaPlayer.value?.release()
+        mediaPlayer.value = MediaPlayer.create(appContext, currentSong)
+        associateInfo()
+        mediaPlayer.value?.start()
+        mediaPlayerPlayingState.value = true
         listenerWhenCompleted = false
     }
 
-    fun prevSong(con: Context) {
-        if (contador != 0) contador -= 1 else contador = 9
-        currentSong = canciones[contador]
-        song?.stop()
-        song?.reset()
-        song?.release()
-        song = MediaPlayer.create(con!!, currentSong!!)
-        associateInfo(con!!)
-        song?.start()
+    fun prevSong() {
+        if (song.value.id != 0) song.value.id -= 1 else song.value.id = canciones.size - 1
+        currentSong = canciones[song.value.id]
+        mediaPlayer.value?.stop()
+        mediaPlayer.value?.reset()
+        mediaPlayer.value?.release()
+        mediaPlayer.value = MediaPlayer.create(appContext, currentSong)
+        associateInfo()
+        mediaPlayer.value?.start()
+        mediaPlayerPlayingState.value = true
     }
 
-    fun associateInfo(con: Context) {
+    fun associateInfo() {
         var metadataRetriever = MediaMetadataRetriever()
         metadataRetriever.setDataSource(
-            con,
+            appContext,
             Uri.parse("android.resource://com.example.mediaplayerapp/${currentSong!!}")
         )
-        cover = createCover(metadataRetriever, con)
-        songName =
+        song.value.cover = createCover(metadataRetriever, appContext)
+        song.value.name =
             metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE).toString()
-        artist =
+        song.value.artist =
             metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST).toString()
-        album =
+        song.value.album =
             metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM).toString()
-        genero = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
-                        .toString()
+        song.value.genre =
+            metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE).toString()
+
     }
 
     fun getSongsBasicDetails(con: Context) {
@@ -116,31 +156,32 @@ class PlayerManager {
                     Uri.parse("android.resource://com.example.mediaplayerapp/${cancion}")
                 )
                 Song(
-                    id = index,
-                    cover = createCover(metadataRetriever, con),
-                    name = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+                    index,
+                    createCover(metadataRetriever, con),
+                    metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
                         .toString(),
-                    artist = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                    metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
                         .toString(),
-                    album = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+                    metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
                         .toString(),
-                    genero = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+                    metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
                         .toString()
                 )
             }
     }
 
     fun saveCurrent(sharedPreferences: SharedPreferences) {
-        val editor = sharedPreferences!!.edit()
-        editor.putInt("current", song!!.currentPosition)
-        editor.putInt("currentSong", currentSong!!)
+//        sharedPreferences = con?.getSharedPreferences("general_settings", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putInt("current", mediaPlayer.value?.let { it.currentPosition } ?: 0)
+        editor.putInt("currentSong", currentSong)
         editor.commit()
     }
 
     fun finishMediaPlayer() {
-        song?.stop()
-        song?.reset()
-        song?.release()
+        mediaPlayer.value?.stop()
+        mediaPlayer.value?.reset()
+        mediaPlayer.value?.release()
     }
 
     private fun createCover(mmr: MediaMetadataRetriever, con: Context): Bitmap {
@@ -148,7 +189,40 @@ class PlayerManager {
         val bitmap = BitmapFactory.decodeByteArray(embedPic, 0, embedPic!!.size)
         return bitmap ?: BitmapFactory.decodeResource(
             con.resources,
-            R.drawable.ic_launcher_background
+            R.drawable.ic_baseline_music_note_24
         )
+    }
+
+    fun playStop() {
+        val sharedPreferences = appContext?.getSharedPreferences("general_settings", MODE_PRIVATE)
+        mediaPlayer.value?.let {
+            if (it.isPlaying) {
+
+                it.pause()
+                mediaPlayerPlayingState.value = false
+                saveCurrent(sharedPreferences)
+//                binding.playStopButton.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+//                paused = true
+//                (activity as MainActivity).manager.saveCurrent(sharedPreferences)
+            } else {
+//                val current = sharedPreferences.getInt("current", 0)
+                it.seekTo(sharedPreferences.getInt("current", 0))
+                it.start()
+                mediaPlayerPlayingState.value = true
+
+            }
+        }
+
+//        if (!(activity as MainActivity).manager.song!!.isPlaying()) {
+//            binding.playStopButton.setImageResource(R.drawable.ic_baseline_pause_24)
+//            val current = sharedPreferences.getInt("current", 0)
+//            (activity as MainActivity).manager.song!!.seekTo(current)
+//            (activity as MainActivity).manager.song!!.start()
+//        } else {
+//            (activity as MainActivity).manager.song!!.pause()
+//            binding.playStopButton.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+//            paused = true
+//            (activity as MainActivity).manager.saveCurrent(sharedPreferences)
+//        }
     }
 }

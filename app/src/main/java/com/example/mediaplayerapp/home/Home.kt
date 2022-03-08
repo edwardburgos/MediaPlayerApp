@@ -8,12 +8,14 @@ import com.example.mediaplayerapp.composables.SongsList
 @Composable
 fun Home(
     playerManager: PlayerManager,
-    showDetails: (Int) -> Unit
+    showDetails: (Int) -> Unit,
+    setMediaPlayer: (Int) -> Unit
 ) {
     Column {
         SongsList(
             playerManager.songsBasicInformation,
-            showDetails
+            showDetails,
+            setMediaPlayer
         )
     }
 }

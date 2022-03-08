@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
@@ -22,20 +21,19 @@ import com.example.domain.Song
 @Composable
 fun SongItem(
     song: Song,
-    index: Int,
-    showDetails: (Int) -> Unit
+    showDetails: (Int) -> Unit,
+    setMediaPlayer: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
                 start = 16.dp,
-                top = if (index == 0) 16.dp else 0.dp,
+                top = if (song.id == 0) 16.dp else 0.dp,
                 end = 16.dp,
                 bottom = 16.dp
             )
-            .pointerInput(Unit) {
-            },
+            .clickable { setMediaPlayer(song.id) },
         elevation = 4.dp
     )
     {

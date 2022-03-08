@@ -17,8 +17,7 @@ class MainActivity : ComponentActivity() {
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        playerManager.createMediaPlayer(applicationContext)
-        playerManager.associateInfo(applicationContext)
+        playerManager.createMediaPlayer(applicationContext, -1, false)
         playerManager.getSongsBasicDetails(applicationContext)
         setContent {
             MediaPlayerAppTheme {
@@ -26,7 +25,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    AppComposable(playerManager)
+                    AppComposable(playerManager, applicationContext)
                 }
             }
         }

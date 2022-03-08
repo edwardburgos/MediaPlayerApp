@@ -71,6 +71,6 @@ fun Details(song: Song) {
         )
         Text(song.album, modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, top = 4.dp))
         Text(text = "Genre", style = MaterialTheme.typography.h6)
-        Text(song.genero, modifier = Modifier.padding(start = 16.dp, top = 4.dp))
+        Text(song.genre, modifier = Modifier.padding(start = 16.dp, top = 4.dp))
     }
 }

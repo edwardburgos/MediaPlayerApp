@@ -8,5 +8,5 @@ data class Song(
     var name: String,
     var artist: String,
     var album: String,
-    val genero: String
+    var genre: String
 )
