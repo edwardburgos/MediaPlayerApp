@@ -95,6 +95,9 @@ class PlayerManager {
             }
             song.value.id = canciones.indexOf(currentSong)
             mediaPlayer.value = MediaPlayer.create(con!!, currentSong!!)
+            mediaPlayer.value?.setOnCompletionListener {
+                nextSong()
+            }
             if (requestedByUser) {
                 mediaPlayer.value?.start()
                 mediaPlayerPlayingState.value = true
@@ -110,6 +113,9 @@ class PlayerManager {
         mediaPlayer.value?.reset()
         mediaPlayer.value?.release()
         mediaPlayer.value = MediaPlayer.create(appContext, currentSong)
+        mediaPlayer.value?.setOnCompletionListener {
+            nextSong()
+        }
         associateInfo()
         mediaPlayer.value?.start()
         mediaPlayerPlayingState.value = true
@@ -123,10 +129,15 @@ class PlayerManager {
         mediaPlayer.value?.reset()
         mediaPlayer.value?.release()
         mediaPlayer.value = MediaPlayer.create(appContext, currentSong)
+        mediaPlayer.value?.setOnCompletionListener {
+            nextSong()
+        }
         associateInfo()
         mediaPlayer.value?.start()
         mediaPlayerPlayingState.value = true
     }
+
+//    if (!(
 
     fun associateInfo() {
         var metadataRetriever = MediaMetadataRetriever()
