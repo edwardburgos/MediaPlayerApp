@@ -3,11 +3,8 @@ package com.example.mediaplayerapp.composables
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,8 +32,7 @@ fun SongItem(
             )
             .clickable { setMediaPlayer(song.id) },
         elevation = 4.dp
-    )
-    {
+    ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.height(IntrinsicSize.Min),
@@ -56,7 +52,6 @@ fun SongItem(
                             }
                         ),
                         contentDescription = null,
-
                         modifier = Modifier
                             .height(70.dp)
                             .padding(end = 16.dp),
@@ -84,16 +79,16 @@ fun SongItem(
             }
             Column(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(horizontal = 16.dp),
+                    .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "See details",
-                    tint = MaterialTheme.colors.primary,
-                    modifier = Modifier.clickable { showDetails(song.id) }
-                )
+                IconButton(onClick = { showDetails(song.id) }) {
+                    Icon(
+                        imageVector = Filled.MoreVert,
+                        contentDescription = "See details",
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
             }
         }
     }

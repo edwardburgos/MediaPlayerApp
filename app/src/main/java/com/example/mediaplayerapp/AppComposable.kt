@@ -45,8 +45,12 @@ fun AppComposable(playerManager: PlayerManager, context: Context) {
                         playerManager,
                         playerManager.song.value,
                         playerManager.mediaPlayerPlayingState.value,
-                        it
-                    )
+                        it,
+                        navController
+                    ) { id ->
+                        songId.value = id
+                        scope.launch { state.show() }
+                    }
                 }
             }
         }
