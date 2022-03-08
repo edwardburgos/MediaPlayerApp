@@ -69,4 +69,7 @@ dependencies {
     // Material Icons Extended
     implementation "androidx.compose.material:material-icons-extended:$material_icons_extended_version"
 
+    // System UI Controller
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$system_ui_controller_version"
+
 }
