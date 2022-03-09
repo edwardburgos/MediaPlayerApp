@@ -23,7 +23,7 @@ fun Home(
                 backgroundColor = Color.Transparent,
                 elevation = 0.dp
             )
-        },
+        }
     ) {
         Column {
             SongsList(

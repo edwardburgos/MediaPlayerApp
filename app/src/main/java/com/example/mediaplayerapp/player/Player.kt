@@ -27,18 +27,21 @@ fun Player(
     mediaPlayer: MediaPlayer,
     navController: NavHostController,
     showDetails: (Int) -> Unit,
+    navigationAvailable: Boolean
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Filled.ArrowBack,
-                            contentDescription = "Go Back",
-                            tint = MaterialTheme.colors.primary
-                        )
+                    if (navigationAvailable) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                Filled.ArrowBack,
+                                contentDescription = "Go Back",
+                                tint = MaterialTheme.colors.primary
+                            )
+                        }
                     }
                 },
                 actions = {
@@ -58,7 +61,12 @@ fun Player(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(
+                    start = if (navigationAvailable) 16.dp else 0.dp,
+                    top = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
             verticalArrangement = Arrangement.Center
         ) {
             Row(
@@ -104,7 +112,7 @@ fun Player(
                             contentDescription = "Previous song",
                             tint = MaterialTheme.colors.primary,
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(if (navigationAvailable) 40.dp else 20.dp)
                                 .clickable { playerManager.prevSong() }
                         )
                         Column(
@@ -115,7 +123,7 @@ fun Player(
                                 contentDescription = "Play / Stop",
                                 tint = MaterialTheme.colors.primary,
                                 modifier = Modifier
-                                    .size(70.dp)
+                                    .size(if (navigationAvailable) 70.dp else 40.dp)
                                     .clickable { playerManager.playStop() }
                             )
                         }
@@ -124,7 +132,7 @@ fun Player(
                             contentDescription = "Next song",
                             tint = MaterialTheme.colors.primary,
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(if (navigationAvailable) 40.dp else 20.dp)
                                 .clickable { playerManager.nextSong() }
                         )
                     }

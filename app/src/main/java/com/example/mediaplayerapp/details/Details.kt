@@ -1,10 +1,10 @@
 package com.example.mediaplayerapp.details
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,11 +15,24 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.example.domain.Song
+import com.example.mediaplayerapp.composables.BackPressHandler
 
+@ExperimentalMaterialApi
 @Composable
-fun Details(song: Song) {
+fun Details(
+    scrollState: ScrollState,
+    song: Song,
+    modalBottomSheetState: ModalBottomSheetState,
+    onBack: () -> Unit,
+    configuration: Configuration
+) {
+    if (modalBottomSheetState.isVisible) BackPressHandler(onBackPressed = onBack)
+
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxHeight(if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.8f else 0.5f)
+            .verticalScroll(scrollState)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -37,7 +50,6 @@ fun Details(song: Song) {
                         }
                     ),
                     contentDescription = null,
-
                     modifier = Modifier
                         .height(140.dp)
                 )
