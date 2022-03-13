@@ -1,6 +1,5 @@
 package com.example.mediaplayerapp
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,11 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import com.example.mediaplayerapp.alarm.Alarm
 import com.example.mediaplayerapp.player.Player
+import com.example.mediaplayerapp.utils.AmPm
 
 @ExperimentalMaterialApi
 @Composable
-fun AppComposable(playerManager: PlayerManager, context: Context) {
+fun AppComposable(
+    playerManager: PlayerManager,
+    setAlarm: (Int, Int, AmPm) -> Unit
+) {
     val navController = rememberNavController()
     val songId = remember { mutableStateOf(0) }
     val configuration = LocalConfiguration.current
@@ -50,13 +54,57 @@ fun AppComposable(playerManager: PlayerManager, context: Context) {
             )
         }
     ) {
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Row(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(playerManager.mediaPlayer.value?.let { 0.8f } ?: 1f)
-                ) {
+        NavHost(navController = navController, startDestination = "home") {
+            composable("home") {
+                if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(playerManager.mediaPlayer.value?.let { 0.8f }
+                                ?: 1f)
+                        ) {
+                            Home(
+                                playerManager,
+                                { id ->
+                                    songId.value = id
+                                    scope.launch {
+                                        scrollState.scrollTo(0)
+                                        state.animateTo(ModalBottomSheetValue.Expanded)
+                                    }
+                                }, { id ->
+                                    playerManager.createMediaPlayer(
+                                        id,
+                                        true
+                                    )
+                                }) { navController.navigate("alarm") }
+                        }
+                        playerManager.mediaPlayer.value?.let {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(1f)
+                                    .background(Color.Red)
+                            ) {
+                                Player(
+                                    playerManager,
+                                    playerManager.song.value,
+                                    playerManager.mediaPlayerPlayingState.value,
+                                    it,
+                                    navController,
+                                    { id ->
+                                        songId.value = id
+                                        scope.launch {
+                                            scrollState.scrollTo(0)
+                                            state.animateTo(ModalBottomSheetValue.Expanded)
+                                        }
+                                    },
+                                    false
+                                )
+                            }
+
+                        }
+                    }
+                } else {
                     Home(
                         playerManager,
                         { id ->
@@ -65,52 +113,65 @@ fun AppComposable(playerManager: PlayerManager, context: Context) {
                                 scrollState.scrollTo(0)
                                 state.animateTo(ModalBottomSheetValue.Expanded)
                             }
-                        }) { id ->
-                        playerManager.createMediaPlayer(context, id, true)
-                    }
-                }
-                playerManager.mediaPlayer.value?.let {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .background(Color.Red)
-                    ) {
-                        Player(
-                            playerManager,
-                            playerManager.song.value,
-                            playerManager.mediaPlayerPlayingState.value,
-                            it,
-                            navController,
-                            { id ->
-                                songId.value = id
-                                scope.launch {
-                                    scrollState.scrollTo(0)
-                                    state.animateTo(ModalBottomSheetValue.Expanded)
-                                }
-                            },
-                            false
-                        )
-                    }
-
+                        }, { id ->
+                            navController.navigate("player")
+                            playerManager.createMediaPlayer(
+                                id,
+                                true
+                            )
+                        }) { navController.navigate("alarm") }
                 }
             }
-        } else {
-            NavHost(navController = navController, startDestination = "home") {
-                composable("home") {
-                    Home(
-                        playerManager,
-                        { id ->
-                            songId.value = id
-                            scope.launch {
-                                scrollState.scrollTo(0)
-                                state.animateTo(ModalBottomSheetValue.Expanded)
+            composable("player") {
+                if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(playerManager.mediaPlayer.value?.let { 0.8f }
+                                ?: 1f)
+                        ) {
+                            Home(
+                                playerManager,
+                                { id ->
+                                    songId.value = id
+                                    scope.launch {
+                                        scrollState.scrollTo(0)
+                                        state.animateTo(ModalBottomSheetValue.Expanded)
+                                    }
+                                }, { id ->
+                                    playerManager.createMediaPlayer(
+                                        id,
+                                        true
+                                    )
+                                }) { navController.navigate("alarm") }
+                        }
+                        playerManager.mediaPlayer.value?.let {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(1f)
+                                    .background(Color.Red)
+                            ) {
+                                Player(
+                                    playerManager,
+                                    playerManager.song.value,
+                                    playerManager.mediaPlayerPlayingState.value,
+                                    it,
+                                    navController,
+                                    { id ->
+                                        songId.value = id
+                                        scope.launch {
+                                            scrollState.scrollTo(0)
+                                            state.animateTo(ModalBottomSheetValue.Expanded)
+                                        }
+                                    },
+                                    false
+                                )
                             }
-                        }) { id ->
-                        navController.navigate("player")
-                        playerManager.createMediaPlayer(context, id, true)
+
+                        }
                     }
-                }
-                composable("player") {
+                } else {
                     playerManager.mediaPlayer.value?.let {
                         Player(
                             playerManager,
@@ -129,6 +190,9 @@ fun AppComposable(playerManager: PlayerManager, context: Context) {
                         )
                     }
                 }
+            }
+            composable("alarm") {
+                Alarm(setAlarm, navController)
             }
         }
     }

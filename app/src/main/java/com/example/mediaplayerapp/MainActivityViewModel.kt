@@ -1,4 +1,8 @@
 package com.example.mediaplayerapp
 
-class MainActivityViewModel {
+import androidx.lifecycle.ViewModel
+
+class MainActivityViewModel : ViewModel() {
+    val mediaPlayer = PlayerManager()
+    var mediaPlayerCreated = false
 }
